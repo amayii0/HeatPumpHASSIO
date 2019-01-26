@@ -18,11 +18,6 @@ HeatPump hp;
 unsigned long lastTempSend;
 unsigned long lastSync;
 
-// debug mode, when true, will send all packets received from the heatpump to topic heatpump_debug_topic
-// this can also be set by sending "on" to heatpump_debug_set_topic
-bool _debugMode = IS_DEBUG_MODE;
-
-
 void setup() {
   //pinMode(redLedPin, OUTPUT);
   //digitalWrite(redLedPin, HIGH);
@@ -120,7 +115,7 @@ void hpStatusChanged(heatpumpStatus currentStatus) {
 }
 
 void hpPacketDebug(byte* packet, unsigned int length, char* packetDirection) {
-  if (_debugMode) {
+  if (IS_DEBUG_MODE) {
     String message;
     for (int idx = 0; idx < length; idx++) {
       if (packet[idx] < 16) {
@@ -233,10 +228,10 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 
   } else if (strcmp(topic, heatpump_debug_set_topic) == 0) { //if the incoming message is on the heatpump_debug_set_topic topic...
     if (strcmp(message, "on") == 0) {
-      _debugMode = true;
+      IS_DEBUG_MODE = true;
       mqtt_client.publish(heatpump_debug_topic, "debug mode enabled");
     } else if (strcmp(message, "off") == 0) {
-      _debugMode = false;
+      IS_DEBUG_MODE = false;
       mqtt_client.publish(heatpump_debug_topic, "debug mode disabled");
     }
   } else {
